@@ -17,7 +17,7 @@ import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 // @ts-ignore
 import html2pdf from 'html2pdf.js';
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -238,8 +238,8 @@ export default function App() {
         throw new Error('MISSING_API_KEY');
       }
 
-      const ai = new GoogleGenAI(apiKey);
-      const model = "gemini-1.5-flash"; 
+      const ai = new GoogleGenerativeAI(apiKey);
+  const model = "gemini-1.5-flash"; 
       
       // Process in chunks of 3 for better reliability and progress tracking
       const CHUNK_SIZE = 3;
@@ -256,20 +256,19 @@ export default function App() {
           }
         }));
 
-        const response = await ai.models.generateContent({
+        const modelInstance = ai.getGenerativeModel({ 
           model: "gemini-1.5-flash",
-          contents: [{
-            parts: [
-              ...imageParts,
-              { text: `Extract questions from these images. Rules: Group into sections, capture exact wording, NO question numbers in 'text'. Types: 'mcq', 'fill_blanks', 'short_answer', 'normal'. Return ONLY a JSON array of sections. Follow this schema: [{title: string, marks: number, questions: [{type: string, text: string, options: [{text: string}]}]}]` }
-            ]
-          }],
-          config: {
+          generationConfig: {
             responseMimeType: "application/json"
           }
         });
+        
+        const result = await modelInstance.generateContent([
+          ...imageParts,
+          `Extract questions from these images. Rules: Group into sections, capture exact wording, NO question numbers in 'text'. Types: 'mcq', 'fill_blanks', 'short_answer', 'normal'. Return ONLY a JSON array of sections. Follow this schema: [{title: string, marks: number, questions: [{type: string, text: string, options: [{text: string}]}]}]`
+        ]);
 
-        const responseText = response.text;
+        const responseText = result.response.text();
         const cleanedText = responseText.replace(/```json\n?|\n?```/g, '').trim();
         const extractedChunk = JSON.parse(cleanedText);
         allExtractedSections = [...allExtractedSections, ...extractedChunk];
