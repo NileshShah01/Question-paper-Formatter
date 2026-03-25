@@ -233,12 +233,12 @@ export default function App() {
     }, 3000);
 
     try {
-      const apiKey = process.env.GEMINI_API_KEY;
+      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
       if (!apiKey) {
         throw new Error('MISSING_API_KEY');
       }
 
-      const ai = new GoogleGenAI({ apiKey });
+      const ai = new GoogleGenAI(apiKey);
       const model = "gemini-1.5-flash"; 
       
       // Process in chunks of 3 for better reliability and progress tracking
