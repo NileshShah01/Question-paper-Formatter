@@ -256,19 +256,20 @@ export default function App() {
           }
         }));
 
-        const result = await ai.getGenerativeModel({ model }).generateContent({
+        const response = await ai.models.generateContent({
+          model: "gemini-1.5-flash",
           contents: [{
             parts: [
               ...imageParts,
               { text: `Extract questions from these images. Rules: Group into sections, capture exact wording, NO question numbers in 'text'. Types: 'mcq', 'fill_blanks', 'short_answer', 'normal'. Return ONLY a JSON array of sections. Follow this schema: [{title: string, marks: number, questions: [{type: string, text: string, options: [{text: string}]}]}]` }
             ]
           }],
-          generationConfig: {
+          config: {
             responseMimeType: "application/json"
           }
         });
 
-        const responseText = result.response.text();
+        const responseText = response.text;
         const cleanedText = responseText.replace(/```json\n?|\n?```/g, '').trim();
         const extractedChunk = JSON.parse(cleanedText);
         allExtractedSections = [...allExtractedSections, ...extractedChunk];
