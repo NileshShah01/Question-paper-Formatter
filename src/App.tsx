@@ -410,6 +410,52 @@ export default function App() {
     }
   };
 
+  const handleDownloadWord = () => {
+    if (!previewRef.current) return;
+    
+    try {
+      const headerHtml = `
+        <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+        <head>
+          <meta charset='utf-8'>
+          <title>Question Paper</title>
+          <style>
+            body { font-family: 'Calibri', 'Arial', sans-serif; line-height: 1.2; }
+            .exam-paper { width: 100%; border: none; }
+            .exam-school-name { text-align: center; font-size: 24pt; font-weight: bold; text-decoration: underline; text-transform: uppercase; }
+            .exam-header-row { display: table; width: 100%; font-size: 12pt; border-bottom: 1pt solid black; margin-bottom: 10pt; }
+            .exam-header-item { display: table-cell; }
+            .exam-header-item.center { text-align: center; }
+            .exam-header-item.right { text-align: right; }
+            .section-header { font-weight: bold; margin-top: 15pt; }
+            .question-item { margin-top: 5pt; }
+          </style>
+        </head>
+        <body>
+      `;
+      const footerHtml = "</body></html>";
+      
+      const source = headerHtml + previewRef.current.innerHTML + footerHtml;
+      const fileContents = '<html>\n' + source + '\n</html>';
+      
+      const blob = new Blob(['\ufeff', source], {
+        type: 'application/msword'
+      });
+      
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${header.schoolName.replace(/\s+/g, '_')}_${header.subject}_Exam.doc`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Word Download failed:", error);
+      alert("Word download failed.");
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-zinc-50">
       {/* Left Panel: Input Form */}
@@ -748,6 +794,13 @@ export default function App() {
                 <Download className="w-5 h-5" />
               )}
               {isDownloading ? 'Generating PDF...' : 'Download PDF'}
+            </button>
+            <button 
+              onClick={handleDownloadWord}
+              className="flex-1 flex items-center justify-center gap-2 px-6 py-3 border-2 border-zinc-900 text-zinc-900 rounded-xl hover:bg-zinc-50 transition-colors font-semibold"
+            >
+              <FileText className="w-5 h-5" />
+              Download Word
             </button>
           </div>
         </div>
