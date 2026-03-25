@@ -1,0 +1,205 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
+  
+  --color-zinc-50: #fafafa;
+  --color-zinc-100: #f4f4f5;
+  --color-zinc-200: #e4e4e7;
+  --color-zinc-300: #d4d4d8;
+  --color-zinc-400: #a1a1aa;
+  --color-zinc-500: #71717a;
+  --color-zinc-600: #52525b;
+  --color-zinc-700: #3f3f46;
+  --color-zinc-800: #27272a;
+  --color-zinc-900: #18181b;
+  --color-zinc-950: #09090b;
+
+  --color-amber-400: #fbbf24;
+  --color-amber-500: #f59e0b;
+  --color-red-500: #ef4444;
+  --color-blue-500: #3b82f6;
+  --color-green-500: #22c55e;
+  --color-slate-500: #64748b;
+  --color-gray-500: #6b7280;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+@layer base {
+  body {
+    @apply bg-zinc-50 text-zinc-900;
+  }
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-only {
+    display: block !important;
+  }
+
+  body {
+    background: white !important;
+  }
+
+  /* Ensure the paper takes full width and looks correct */
+  #exam-paper-preview {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+}
+
+/* Custom styles for the exam paper look */
+.exam-paper {
+  font-family: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
+  line-height: 1.2;
+  color: #000000;
+  background: #ffffff;
+  width: 210mm; /* A4 Width */
+  min-height: 297mm; /* A4 Height */
+  margin: 0 auto;
+  padding: 8mm 12mm;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  box-sizing: border-box;
+  font-size: 12px;
+}
+
+.exam-header-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 10px;
+  position: relative;
+}
+
+.exam-logo-container {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.exam-school-name {
+  text-align: center;
+  font-weight: bold;
+  font-size: 24px;
+  text-transform: uppercase;
+  line-height: 1.1;
+}
+
+.exam-school-sub {
+  font-size: 16px;
+  font-weight: normal;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.exam-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2px;
+  font-size: 12px;
+}
+
+.exam-header-row.last {
+  border-top: 1px solid black;
+  border-bottom: 1px solid black;
+  padding: 2px 0;
+  margin-top: 4px;
+  margin-bottom: 10px;
+}
+
+.exam-header-item {
+  flex: 1;
+}
+
+.exam-header-item.center {
+  text-align: center;
+}
+
+.exam-header-item.right {
+  text-align: right;
+}
+
+.section-container {
+  margin-bottom: 12px;
+  margin-top: 10px;
+  break-inside: avoid;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 2px;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.question-list {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.question-item {
+  display: flex;
+  margin-bottom: 10px;
+  align-items: flex-start;
+  break-inside: avoid;
+}
+
+.question-label {
+  width: 25px;
+  flex-shrink: 0;
+  font-weight: bold;
+}
+
+.question-content {
+  flex: 1;
+}
+
+.mcq-container-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 2px;
+  padding-left: 0;
+}
+
+.mcq-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.checkbox-square {
+  width: 10px;
+  height: 10px;
+  border: 1px solid black;
+  margin-left: 2px;
+}
+
+/* Table for Roman Numerals or similar grid questions */
+.question-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+  border: 1px solid black;
+  margin-top: 10px;
+}
+
+.grid-cell {
+  border: 1px solid black;
+  padding: 8px;
+  text-align: center;
+  min-height: 40px;
+}

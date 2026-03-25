@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "firebase-mcp-server": {
+      "$typeName": "exa.cascade_plugins_pb.CascadePluginCommandTemplate",
+      "command": "npx",
+      "args": [
+        "-y",
+        "firebase-tools@latest",
+        "mcp"
+      ],
+      "env": {}
+    }
+  }
+}
