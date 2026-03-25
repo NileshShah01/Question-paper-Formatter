@@ -47,8 +47,10 @@ interface Section {
 
 interface HeaderInfo {
   schoolName: string;
+  schoolSubName: string;
   examName: string;
   examTerm: string;
+  examSession: string;
   date: string;
   time: string;
   className: string;
@@ -62,15 +64,22 @@ type LayoutType = 'single' | 'dual';
 export default function App() {
   const [layout, setLayout] = useState<LayoutType>('single');
   const toRoman = (num: number) => {
-    const romanMap: { [key: number]: string } = {
-      1: 'I', 2: 'II', 3: 'III', 4: 'IV', 5: 'V', 6: 'VI', 7: 'VII', 8: 'VIII', 9: 'IX', 10: 'X'
-    };
-    return romanMap[num] || num.toString();
+    const lookup: { [key: string]: number } = { M: 1000, CM: 900, D: 500, CD: 400, C: 100, XC: 90, L: 50, XL: 40, X: 10, IX: 9, V: 5, IV: 4, I: 1 };
+    let roman = '', i;
+    for (i in lookup) {
+      while (num >= lookup[i]) {
+        roman += i;
+        num -= lookup[i];
+      }
+    }
+    return roman;
   };
   const [header, setHeader] = useState<HeaderInfo>({
     schoolName: 'APEX PUBLIC SCHOOL',
+    schoolSubName: 'ANJANI BAZAR',
     examName: '2nd TERMINAL EXAMINATION',
-    examTerm: 'NOV - 2025',
+    examTerm: 'NOV',
+    examSession: '2025-26',
     date: '03/12/2025',
     time: '3hrs.',
     className: '3rd',
@@ -282,7 +291,7 @@ export default function App() {
           id: Math.random().toString(36).substr(2, 9),
           type: q.type || 'normal',
           text: cleanQuestionText(q.text || ''),
-          options: q.options?.map((o: any, i: number) => ({ id: i.toString(), text: o.text || '' }))
+          options: q.options?.map((o: any, i: number) => ({ id: Math.random().toString(36).substr(2, 9), text: o.text || '' })) || (q.type === 'mcq' ? [{ id: '1', text: '' }, { id: '2', text: '' }, { id: '3', text: '' }, { id: '4', text: '' }] : [])
         }))
       }));
 
@@ -328,7 +337,12 @@ export default function App() {
           ...s,
           questions: [
             ...s.questions,
-            { id: Date.now().toString(), type: 'normal', text: '' }
+            { 
+              id: Date.now().toString(), 
+              type: 'normal', 
+              text: '', 
+              options: [] 
+            }
           ]
         };
       }
@@ -466,19 +480,24 @@ export default function App() {
                 <FileText className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold tracking-tight">ExamCraft AI</h1>
-                <p className="text-sm text-zinc-500 italic">Handwritten to Professional Format</p>
+                <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-zinc-900 to-zinc-600 bg-clip-text text-transparent">ExamCraft AI</h1>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Handwritten to Professional Format</p>
               </div>
             </div>
           </header>
 
           {/* AI Upload Section */}
-          <section className="bg-zinc-900 text-white p-6 rounded-2xl shadow-xl space-y-4">
+          <section className="bg-gradient-to-br from-zinc-900 via-indigo-950 to-zinc-900 text-white p-6 rounded-3xl shadow-2xl space-y-4 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 blur-3xl -mr-16 -mt-16 group-hover:bg-indigo-500/20 transition-all" />
+            
             <div className="flex items-center gap-2 mb-2">
-              <Sparkles className="w-5 h-5 text-amber-400" />
-              <h2 className="text-lg font-semibold">AI Question Extractor</h2>
+              <div className="p-1.5 bg-amber-400/20 rounded-lg">
+                <Sparkles className="w-5 h-5 text-amber-400" />
+              </div>
+              <h2 className="text-lg font-bold tracking-tight">AI Smart Extraction</h2>
+              <span className="ml-auto text-[10px] bg-indigo-500/40 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider border border-indigo-400/30">Pro Feature</span>
             </div>
-            <p className="text-zinc-400 text-sm">Upload photos of your handwritten paper and let AI transcribe them into a professional format.</p>
+            <p className="text-zinc-400 text-xs leading-relaxed">Turn handwritten notes into professional papers. Upload photos for instant AI transcription.</p>
             
             <div className="flex gap-4">
               <label className="flex-1 flex flex-col items-center justify-center gap-2 p-4 border-2 border-dashed border-zinc-700 rounded-xl hover:border-zinc-500 transition-colors cursor-pointer bg-zinc-800/50">
@@ -547,6 +566,22 @@ export default function App() {
                     <input type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
                   </label>
                 </div>
+              </div>
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-zinc-500 mb-1">Sub Title (Address)</label>
+                <input 
+                  type="text" name="schoolSubName" value={header.schoolSubName} onChange={handleHeaderChange}
+                  className="w-full px-4 py-2 rounded-xl border border-zinc-200 focus:ring-2 focus:ring-zinc-900 focus:border-transparent outline-none transition-all"
+                  placeholder="e.g. ANJANI BAZAR"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-zinc-500 mb-1">Exam Session</label>
+                <input 
+                  type="text" name="examSession" value={header.examSession} onChange={handleHeaderChange}
+                  className="w-full px-4 py-2 rounded-xl border border-zinc-200 focus:ring-2 focus:ring-zinc-900 focus:border-transparent outline-none transition-all"
+                  placeholder="e.g. 2025-26"
+                />
               </div>
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-zinc-500 mb-1">Exam Name</label>
@@ -630,15 +665,33 @@ export default function App() {
                 </div>
                 <button 
                   onClick={addSection}
-                  className="flex items-center gap-2 px-4 py-2 bg-zinc-900 text-white rounded-xl hover:bg-zinc-800 transition-colors text-sm font-medium"
+                  className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all shadow-md hover:shadow-lg active:scale-95 text-sm font-semibold"
                 >
                   <Plus className="w-4 h-4" /> Add Section
                 </button>
               </div>
             </div>
 
+            {sections.length === 0 && (
+              <div className="flex flex-col items-center justify-center py-12 px-6 border-2 border-dashed border-zinc-200 rounded-3xl bg-zinc-50 text-center space-y-4">
+                <div className="p-4 bg-white rounded-2xl shadow-sm border border-zinc-100">
+                  <PlusCircle className="w-8 h-8 text-zinc-300" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-zinc-900">No sections yet</h3>
+                  <p className="text-sm text-zinc-500 max-w-[240px] mx-auto leading-relaxed">Starting from scratch? Add a section manually or use AI extraction.</p>
+                </div>
+                <button 
+                  onClick={addSection}
+                  className="px-6 py-2.5 bg-zinc-900 text-white rounded-xl hover:bg-zinc-800 transition-all font-semibold shadow-md active:scale-95"
+                >
+                  Create First Section
+                </button>
+              </div>
+            )}
+
             {sections.map((section, sIdx) => (
-              <div key={section.id} className="bg-white border border-zinc-200 rounded-2xl overflow-hidden shadow-sm">
+              <div key={section.id} className="bg-white border border-zinc-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:border-indigo-200 transition-all group/section">
                 <div className="bg-zinc-50 p-4 border-bottom border-zinc-200 flex items-center justify-between gap-4">
                   <div className="flex-1 flex gap-4">
                     <div className="flex-1">
@@ -702,23 +755,46 @@ export default function App() {
 
                           {question.type === 'mcq' && (
                             <div className="space-y-2 pl-4 border-l-2 border-zinc-200">
-                              <p className="text-[10px] font-bold uppercase text-zinc-400">Options</p>
-                              {[0, 1, 2].map(optIdx => (
-                                <div key={optIdx} className="flex items-center gap-2">
-                                  <div className="w-4 h-4 border border-zinc-300 rounded" />
+                              <div className="flex items-center justify-between mb-2">
+                                <p className="text-[10px] font-bold uppercase text-zinc-400">Options</p>
+                                <button 
+                                  onClick={() => {
+                                    const newOptions = [...(question.options || []), { id: Date.now().toString(), text: '' }];
+                                    updateQuestion(section.id, question.id, 'options', newOptions);
+                                  }}
+                                  className="text-[10px] font-bold text-indigo-600 hover:text-indigo-700 uppercase"
+                                >
+                                  + Add Option
+                                </button>
+                              </div>
+                              {question.options?.map((opt, optIdx) => (
+                                <div key={opt.id} className="flex items-center gap-2 group">
+                                  <div className="w-4 h-4 border border-zinc-300 rounded shrink-0" />
                                   <input 
                                     type="text"
                                     placeholder={`Option ${String.fromCharCode(65 + optIdx)}`}
                                     className="flex-1 text-sm bg-transparent border-b border-zinc-200 focus:border-zinc-900 outline-none py-1"
-                                    value={question.options?.[optIdx]?.text || ''}
+                                    value={opt.text}
                                     onChange={(e) => {
                                       const newOptions = [...(question.options || [])];
-                                      newOptions[optIdx] = { id: optIdx.toString(), text: e.target.value };
+                                      newOptions[optIdx] = { ...newOptions[optIdx], text: e.target.value };
                                       updateQuestion(section.id, question.id, 'options', newOptions);
                                     }}
                                   />
+                                  <button 
+                                    onClick={() => {
+                                      const newOptions = question.options?.filter((_, i) => i !== optIdx);
+                                      updateQuestion(section.id, question.id, 'options', newOptions);
+                                    }}
+                                    className="opacity-0 group-hover:opacity-100 p-1 text-zinc-400 hover:text-red-500 transition-opacity"
+                                  >
+                                    <X className="w-3 h-3" />
+                                  </button>
                                 </div>
                               ))}
+                              {(!question.options || question.options.length === 0) && (
+                                <p className="text-xs text-zinc-400 italic">No options added. Click '+ Add Option' to start.</p>
+                              )}
                             </div>
                           )}
 
@@ -742,13 +818,24 @@ export default function App() {
                   ))}
                   <button 
                     onClick={() => addQuestion(section.id)}
-                    className="w-full py-2 border-2 border-dashed border-zinc-200 rounded-xl text-zinc-400 hover:text-zinc-900 hover:border-zinc-900 transition-all flex items-center justify-center gap-2 text-sm font-medium"
+                    className="w-full py-3 border-2 border-dashed border-zinc-200 rounded-xl text-zinc-400 hover:text-indigo-600 hover:border-indigo-200 hover:bg-indigo-50/50 transition-all flex items-center justify-center gap-2 text-sm font-bold active:scale-[0.99]"
                   >
                     <Plus className="w-4 h-4" /> Add Question
                   </button>
                 </div>
               </div>
             ))}
+
+            {sections.length > 0 && (
+              <div className="flex justify-center pt-4">
+                <button 
+                  onClick={addSection}
+                  className="flex items-center gap-2 px-8 py-3 bg-zinc-100 text-zinc-600 rounded-2xl hover:bg-zinc-200 hover:text-zinc-900 transition-all font-bold text-sm"
+                >
+                  <PlusCircle className="w-5 h-5" /> New Section
+                </button>
+              </div>
+            )}
           </section>
 
           {/* Validation Warning */}
@@ -817,15 +904,16 @@ export default function App() {
               {header.schoolName}
             </div>
             <div className="exam-school-sub">
-              (ANJANI BAZAR)
+              ({header.schoolSubName})
             </div>
           </div>
 
           {/* Header Row 1: Time, Exam Name, Date */}
           <div className="exam-header-row">
             <div className="exam-header-item font-bold">Time:{header.time}</div>
-            <div className="exam-header-item center font-bold underline">
-              {header.examName} ({header.examTerm})
+            <div className="exam-header-item center font-bold underline px-2">
+              {header.examName} - {header.examSession}<br/>
+              ({header.examTerm})
             </div>
             <div className="exam-header-item right font-bold">DATE:-{header.date}</div>
           </div>
