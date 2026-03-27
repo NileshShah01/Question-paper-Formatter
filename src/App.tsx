@@ -266,8 +266,7 @@ export default function App() {
         }));
 
         const modelInstance = ai.getGenerativeModel(
-          { model: "gemini-1.5-flash" },
-          { apiVersion: "v1" }
+          { model: "gemini-1.5-flash-002" }
         );
         
         const result = await modelInstance.generateContent([
